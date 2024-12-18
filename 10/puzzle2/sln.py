@@ -76,13 +76,16 @@ def solve(input):
     trailheads, peaks = get_start_and_ends(graph)
     trails: dict[tuple[int, int], Trail] = {}
     for trailhead in trailheads:
-        trails[trailhead] = {'rating': 0, 'peaks': set()}
+        trails[trailhead] = {'rating': 0, 'peaks': {}}
         paths: dict[tuple[int, int], int] = {}
         stack: deque[Node] = deque()
         curr_node = graph[trailhead[0]][trailhead[1]]
         while curr_node:
             if curr_node['value'] == 9:
-                trails[trailhead]['peaks'].add(curr_node['indices'])
+                if curr_node['indices'] not in trails[trailhead]['peaks']:
+                    trails[trailhead]['peaks'][curr_node['indices']] = 1
+                else:
+                    trails[trailhead]['peaks'][curr_node['indices']] += 1
             else:
                 for edge_key in curr_node['edges']:
                     stack.append(curr_node['edges'][edge_key])
@@ -95,8 +98,8 @@ def solve(input):
             curr_node = stack.pop() if len(stack) > 0 else None
 
         if len(trails[trailhead]['peaks']) > 0:
-            for path_count in paths.values():
-                trails[trailhead]['rating'] += path_count
+            for times_peak_reached in trails[trailhead]['peaks'].values():
+                trails[trailhead]['rating'] += times_peak_reached
 
     solution = 0
     for trail in trails.values():
