@@ -1,0 +1,20 @@
+5|3
+4|5
+
+1, 2, 3, 4, 5
+
+i1:
+1, 2, 3, 4, 5
+      ^ find 3 out of place with 5, so swap it with 5
+i2:
+1, 2, 5, 4, 3
+      ^ find 5 is out of place with 4 (now), so swap it with 4
+i3:
+1, 2, 4, 5, 3
+      ^ 4 is not breaking any rules so incremement position
+i4:
+1, 2, 4, 5, 3
+         ^ 5 is not breaking any rules so increment position
+i5:
+1, 2, 4, 5, 3
+            ^ 3 is not breaking any rules so increment position
