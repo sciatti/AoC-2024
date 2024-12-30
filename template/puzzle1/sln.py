@@ -1,7 +1,7 @@
 def parse_input(file_handler):
-    input = None
-    return input
+    puzzle_input = None
+    return puzzle_input
 
-def solve(input):
+def solve(puzzle_input):
     solution = None
     print(f"Solution: {solution}")
