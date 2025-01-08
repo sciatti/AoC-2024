@@ -33,6 +33,16 @@
             "args": [
                 "test_input.txt"
             ]
+        },
+        {
+            "name": "Python Debugger: Other Test Input File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "main.py",
+            "console": "integratedTerminal",
+            "args": [
+                "other_test_input.txt"
+            ]
         }
     ]
 }

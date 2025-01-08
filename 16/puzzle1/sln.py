@@ -65,36 +65,42 @@ def cost_heuristic(puzzle_input: PuzzleInput, current_node: Node) -> int:
             num_turns = 2
         else:
             num_turns = 1
-    return num_turns * 1000 + (puzzle_input.end[0] - current_node.indices[0]) + (puzzle_input.end[1] - current_node.indices[1])
+    return num_turns * 1000 + (current_node.indices[0] - puzzle_input.end[0]) + (puzzle_input.end[1] - current_node.indices[1])
 
 def solve(puzzle_input: PuzzleInput) -> None:
     ts = 0
     def reconstruct_path(came_from: dict[tuple[int, int], Node], current: Node) -> list[Node]:
         total_path: list[Node] = [current]
+        turns = 0
         while current.indices in came_from:
+            prev_node = came_from[current.indices]
+            turns += calc_dir_turns(current.orientation, prev_node)
             current = came_from[current.indices]
             total_path.append(current)
-        return reversed(total_path)
+        return list(reversed(total_path)), turns
     
-    def calc_neighbor_score(dir: str, curr: Node) -> int:
+    def calc_dir_turns(dir: str, curr: Node) -> int:
         if curr.orientation == dir:
-            return 1
+            return 0
         elif curr.orientation in horiz_set:
             # if we have a horizontal start
             if dir in horiz_set:
                 # if there's a horizontal end, we have to turn 2 times
-                return 2001
+                return 2
             else:
                 # otherwise there's a vertical end, we have to turn 1 time
-                return 1001
+                return 1
         else:
             # we must have a vertical start
             if dir in vert_set:
                 # if we have a vertical end this must require 2 turns
-                return 2001
+                return 2
             else:
                 # otherwise there's a horizontal end, we have to turn 1 time
-                return 1001
+                return 1
+    
+    def calc_neighbor_score(dir: str, curr: Node) -> int:
+        return 1 + (1000 * calc_dir_turns(dir, curr))
 
     open_queue = PriorityQueue(maxsize=(len(puzzle_input.grid)-2)*(len(puzzle_input.grid[0])-2))
     start_node = Node(orientation='R', indices=puzzle_input.start, timestamp=ts)
@@ -110,16 +116,18 @@ def solve(puzzle_input: PuzzleInput) -> None:
     f_score: defaultdict[tuple[int, int], int] = defaultdict(lambda: math.inf)
     f_score[puzzle_input.start] = cost_heuristic(puzzle_input, start_node)
 
+    orient_dict: dict[str, str] = {'U': '^', 'D': 'v', 'L': '<', 'R': '>'}
+
     ending_node: Node | None = None
-    c=0
     while not open_queue.empty():
-        if c == 11:
-            breakpoint()
         current: Node = open_queue.get()[1]
+        old_char: str = puzzle_input.grid[current.indices[0]][current.indices[1]]
+        puzzle_input.grid[current.indices[0]][current.indices[1]] = orient_dict[current.orientation]
         open_set.remove(current.indices)
 
         if current.indices == puzzle_input.end:
             ending_node = current
+            puzzle_input.grid[current.indices[0]][current.indices[1]] = old_char
             break
 
         for dir, dir_idx in search_dirs.items():
@@ -127,20 +135,29 @@ def solve(puzzle_input: PuzzleInput) -> None:
             if puzzle_input.grid[nbr_index[0]][nbr_index[1]] == "#":
                 continue
             
+            nbr_char: str = puzzle_input.grid[nbr_index[0]][nbr_index[1]]
+            puzzle_input.grid[nbr_index[0]][nbr_index[1]] = '?'
+
             tentative_g_score = g_score[current.indices] + calc_neighbor_score(dir, current)
             if tentative_g_score < g_score[nbr_index]:
                 nbr_node = Node(indices=nbr_index, orientation=dir, timestamp=ts)
                 ts += 1
-                previous_nodes[nbr_index] = nbr_node
+                previous_nodes[nbr_index] = current
                 g_score[nbr_index] = tentative_g_score
                 f_score[nbr_index] = tentative_g_score + cost_heuristic(puzzle_input, nbr_node)
                 if nbr_index not in open_set:
                     open_queue.put((f_score[nbr_index], nbr_node))
                     open_set.add(nbr_index)
-        c += 1
+            
+            puzzle_input.grid[nbr_index[0]][nbr_index[1]] = nbr_char
+        puzzle_input.grid[current.indices[0]][current.indices[1]] = old_char
 
-    solution_path = reconstruct_path(previous_nodes, ending_node)
-    print(solution_path)
+    solution_path, num_turns = reconstruct_path(previous_nodes, ending_node)
+    for point in solution_path:
+        puzzle_input.grid[point.indices[0]][point.indices[1]] = orient_dict[point.orientation]
+    
+    for line in puzzle_input.grid:
+        print("".join(line))
 
-    solution = None
+    solution = (len(solution_path) - 1) + 1000 * num_turns
     print(f"Solution: {solution}")
