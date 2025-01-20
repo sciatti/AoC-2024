@@ -25,6 +25,16 @@
             ]
         },
         {
+            "name": "Python Debugger: Input2 File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "main.py",
+            "console": "integratedTerminal",
+            "args": [
+                "input2.txt"
+            ]
+        },
+        {
             "name": "Python Debugger: Test Input File",
             "type": "debugpy",
             "request": "launch",
@@ -42,6 +52,16 @@
             "console": "integratedTerminal",
             "args": [
                 "other_test_input.txt"
+            ]
+        },
+        {
+            "name": "Python Debugger: test.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "test.py",
+            "console": "integratedTerminal",
+            "args": [
+                "input.txt"
             ]
         }
     ]

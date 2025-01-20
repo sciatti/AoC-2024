@@ -154,7 +154,7 @@ def solve(puzzle_input: PuzzleInput) -> None:
 
     solution_path, num_turns = reconstruct_path(previous_nodes, ending_node)
     for point in solution_path:
-        puzzle_input.grid[point.indices[0]][point.indices[1]] = orient_dict[point.orientation]
+        puzzle_input.grid[point.indices[0]][point.indices[1]] = 'O'#orient_dict[point.orientation]
     
     for line in puzzle_input.grid:
         print("".join(line))
